@@ -30,7 +30,7 @@ entity lightgame is
           led_active : out std_logic);
 end lightgame;
 
-architecture behavioral of lightgame is
+architecture Behavioral of lightgame is
     type state_type is (init, run, won);
     signal state:  state_type := init;
     signal hit: unsigned := "0";
@@ -51,8 +51,9 @@ process(clk)
                     speed <= speed - to_unsigned(1,15);
                 end if;
                 if rising_edge(btn) then
-                    -- if hit than nothing changes
-                    -- if missed =>init
+                    -- if light not hit then
+                    -- state <= init;
+                    -- end if;
                 end if;
                 -- increase speed
             when won =>
@@ -63,5 +64,5 @@ process(clk)
         end case;
     
     end if;
-    
-end behavioral;
+    end process;
+end Behavioral;
