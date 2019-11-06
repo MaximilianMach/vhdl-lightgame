@@ -1,12 +1,12 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company:
+-- Engineer: Maximilian Mach
 -- 
 -- Create Date: 04.11.2019 13:49:30
 -- Design Name: 
 -- Module Name: led_behavior - Behavioral
--- Project Name: 
--- Target Devices: 
+-- Project Name: vhdl-lightgame
+-- Target Devices: XILINX BASYS 3
 -- Tool Versions: 
 -- Description: 
 -- 
@@ -52,11 +52,10 @@ begin
                 -- shift active led left
                 if leds(17) /= 1 then 
                     leds <= leds * 2;
-                end if;
                 else 
-                    leds 
-
-            
+                    -- shift active led right
+                end if;
+            end if;
         end if;
     end process;
 end behavioral;
