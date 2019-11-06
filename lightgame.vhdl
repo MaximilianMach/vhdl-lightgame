@@ -31,12 +31,20 @@ entity lightgame is
 end lightgame;
 
 architecture Behavioral of lightgame is
+    
+    component led_behavior is
+        port (clk : in std_logic;
+              speed: in unsigned(19 downto 0);
+              led : out std_logic);
+    end component;
+    
     type state_type is (init, run, won);
     signal state:  state_type := init;
     signal hit: unsigned := "0";
     signal speed: unsigned (19 downto 0) := (others=>'0'); 
     
-    
+    run: led_behavior port map(clk)
+
 begin
 process(clk)
     begin

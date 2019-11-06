@@ -32,23 +32,31 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity led_behavior is
-    port ( clk : in std_logic;
-           led : out std_logic );
+    port (clk   : in std_logic;
+          speed : in unsigned(19 downto 0);
+          led   : out std_logic );
 end led_behavior;
 
 architecture behavioral of led_behavior is
-
-component lightgame is
-    port (clk : in std_logic;
-          btn : in std_logic;
-          led_active : out std_logic);
-end component;
+    
+    -- leds to sycle through
+    signal leds: unsigned(17 downto 0) := (others => '0');
+    signal count: unsigned(28 downto 0) := (others => '0');
 
 begin
     toggle: process(clk)
     begin
         if rising_edge(clk) then
-            -- toggle through leds
+            count <= count + 1;
+            if count = speed then
+                -- shift active led left
+                if leds(17) /= 1 then 
+                    leds <= leds * 2;
+                end if;
+                else 
+                    leds 
+
+            
         end if;
     end process;
 end behavioral;
