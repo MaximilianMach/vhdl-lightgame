@@ -42,13 +42,14 @@ architecture Behavioral of lightgame is
     signal state:  state_type := init;
     signal hit: unsigned := "0";
     signal speed: unsigned (19 downto 0) := (others=>'0'); 
-
+    signal led: std_logic;
     signal old_btn: std_logic := '0'; -- saves the old state to check a btn toggle
     
-    led_behav: led_behavior port map(clk, speed);
+    
+    begin
+        led_behav: led_behavior port map(clk=>clk, speed=>speed, led=>led);
+        process(clk)
 
-begin
-process(clk)
     begin
     if rising_edge(clk) then
         case state is
@@ -61,6 +62,8 @@ process(clk)
                     speed <= speed - to_unsigned(1,15);
                 end if;
                 if rising_edge(btn) then
+                    halt <= '1'
+
                     -- if light not hit then
                     -- state <= init;
                     -- end if;
