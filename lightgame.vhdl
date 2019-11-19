@@ -60,9 +60,9 @@ architecture Behavioral of lightgame is
                 if hit < 6 then
                     speed <= speed - to_unsigned(1,15);
                 end if;
-                if rising_edge(btn) then
+                if btn = '1' then
                     halt <= '1'
-
+                    
                     -- if light not hit then
                     -- state <= init;
                     -- end if;
@@ -70,7 +70,7 @@ architecture Behavioral of lightgame is
                 -- increase speed
             when won =>
                 -- lightshow
-                if rising_edge(btn) then
+                if btn = '1' then
                     state <= init;
                 end if;
         end case;
