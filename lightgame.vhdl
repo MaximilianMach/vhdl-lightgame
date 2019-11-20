@@ -40,9 +40,8 @@ architecture Behavioral of lightgame is
     type state_type is (init, run, won);
     signal state:  state_type := init;
     signal hit: unsigned := "0";
-    signal speed: unsigned (19 downto 0) := (others=>'0'); 
-    signal led: std_logic;
-    signal old_btn: std_logic := '0'; -- saves the old state to check a btn toggle
+    signal speed: unsigned (19 downto 0) := (others=>'0');
+    signal led: std_logic_vector (15 downto 0) := (others=>'0');
     
     
     begin
@@ -54,22 +53,27 @@ architecture Behavioral of lightgame is
         case state is
             when init =>
                 -- set start speed 
-                speed <= "10000"; -- example speed
+                speed <= (others=>'1');
+
             when run =>
-                hit <= hit + 1;
                 if hit < 6 then
-                    speed <= speed - to_unsigned(1,15);
+                    -- increase speed
+                    speed <= speed - to_unsigned(1,12);
                 end if;
                 if btn = '1' then
-                    halt <= '1'
+                    halt <= '1';
                     
-                    -- if light not hit then
-                    -- state <= init;
-                    -- end if;
+                    if led = target then
+                        hit <= hit + 1;
+                    else
+                        state <= init;
+                    end if;
+
                 end if;
-                -- increase speed
+
             when won =>
                 -- lightshow
+                
                 if btn = '1' then
                     state <= init;
                 end if;
