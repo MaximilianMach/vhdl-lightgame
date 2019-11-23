@@ -7,5 +7,7 @@ A lightgame similiar to the game "Stacker". Only without stacking
 The leds should switch the anode in a specific speed which is defined in the lighgame.vhdl
 
 # TODO
-- [ ] Signalize win
 - [ ] Determate target LED
+- [X] Signalize win
+  
+  Testing still needs to be done
