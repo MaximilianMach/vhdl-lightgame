@@ -42,6 +42,9 @@ architecture Behavioral of lightgame is
     signal hit: unsigned := "0";
     signal speed: unsigned (19 downto 0) := (others=>'0');
     signal led: std_logic_vector (15 downto 0) := (others=>'0');
+    signal l_win: unsigned := '0';
+    signal r_win: unsigned := '1'
+    signal win_two: unsigned:= '0';
     
     
     begin
@@ -73,7 +76,43 @@ architecture Behavioral of lightgame is
 
             when won =>
                 -- lightshow
-                
+
+                -- counts when to reset led position
+                hit <= '0';
+
+                -- start position are two in center
+                l_win = l_win+1;
+                r_win = r_win+1;
+
+                if hit = '0' then
+                    led[8] <= '1';
+                    led[7] <= '1';
+                    hit <= hit + 1;
+                end if;
+
+
+                if l_win > 15 then
+                    l_win = '0';
+                    r_win = '1';
+
+                    -- init animation 2:
+                    hit <= 'Z';
+                end if;
+
+                -- when already and ends:
+                if hit <= 'Z' then
+                    -- jump led from left to right with rising width
+                    -- goes from outside to inside:
+                    -- goes second
+                    led = shift_right(led, l_win);
+                    led = shift_left(led, r_win);
+                else
+                    -- goes from inside to outside
+                    -- goes fitst
+                    led = shift_left(led, l_win);
+                    led + shift_right(led, r_win);
+                end if;
+
                 if btn = '1' then
                     state <= init;
                 end if;
