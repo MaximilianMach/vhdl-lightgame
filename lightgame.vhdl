@@ -44,8 +44,9 @@ architecture Behavioral of lightgame is
     signal led: std_logic_vector (15 downto 0) := (others=>'0');
     signal l_win: unsigned := '0';
     signal r_win: unsigned := '1'
-    signal win_two: unsigned:= '0';
-    
+    signal win_two: unsigned := '0';
+    signal counter: unsigned (25 downto 0) := (others => '0');
+    signal switch: unsigned := '0';
     
     begin
         led_behav: led_behavior port map(clk=>clk, speed=>speed, led=>led);
@@ -53,16 +54,44 @@ architecture Behavioral of lightgame is
 
     begin
     if rising_edge(clk) then
+        -- decide target led with the time it took till btn press
+
         case state is
             when init =>
                 -- set start speed 
                 speed <= (others=>'1');
 
+
+                counter <= counter + 1;
+
+                -- signalize target and change state
+                if btn = '1' then
+                    -- counter <= counter / 3.14; -- ❗❕ wokrs that?
+
+                    -- take first 4 bits from counter and set its value as target led
+                    led[counter(4 downto 0)] <= '1';
+                    state <= run;
+                end if;
             when run =>
+
+                if switch = '0' then
+
+                    -- if counter full let target led chenge state
+                    if speed <= (others => '1') then
+                        led[coutner(4 downto 0)] <= not led;
+                    end if;
+                    
+                    
+
+                    if btn = '1' then
+                        switch <= '0';
+                    end if;
                 if hit < 6 then
                     -- increase speed
                     speed <= speed - to_unsigned(1,12);
                 end if;
+
+
                 if btn = '1' then
                     halt <= '1';
                     
