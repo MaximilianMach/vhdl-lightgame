@@ -42,11 +42,11 @@ architecture Behavioral of lightgame is
     signal hit: unsigned := "0";
     signal speed: unsigned (19 downto 0) := (others=>'0');
     signal led: std_logic_vector (15 downto 0) := (others=>'0');
-    signal l_win: unsigned := '0';
-    signal r_win: unsigned := '1'
-    signal win_two: unsigned := '0';
+    signal l_win: unsigned := "0";
+    signal r_win: unsigned := "1";
+    signal win_two: unsigned := "0";
     signal counter: unsigned (25 downto 0) := (others => '0');
-    signal switch: unsigned := '0';
+    signal switch: unsigned := "0";
     
     begin
         led_behav: led_behavior port map(clk=>clk, speed=>speed, led=>led);
@@ -61,7 +61,7 @@ architecture Behavioral of lightgame is
                 -- set start speed 
                 speed <= (others=>'1');
 
-
+  
                 counter <= counter + 1;
 
                 -- signalize target and change state
@@ -69,7 +69,7 @@ architecture Behavioral of lightgame is
                     -- counter <= counter / 3.14; -- ❗❕ works that?
 
                     -- take first 4 bits from counter and set its value as target led
-                    led[counter(4 downto 0)] <= '1';
+                    led(counter(4 downto 0)) <= '1';
                     state <= run;
                 end if;
             when run =>
@@ -77,7 +77,7 @@ architecture Behavioral of lightgame is
                 if switch = '0' then
                     -- if counter full let target led change state
                     if speed <= (others => '1') then
-                        led[coutner(4 downto 0)] <= not led;
+                        led(coutner(4 downto 0)) <= not led;
                     end if;
                     
                     if btn = '1' then
@@ -112,8 +112,8 @@ architecture Behavioral of lightgame is
                 r_win = r_win+1;
 
                 if hit = '0' then
-                    led[8] <= '1';
-                    led[7] <= '1';
+                    led(8) <= '1';
+                    led(7) <= '1';
                     hit <= hit + 1;
                 end if;
 
@@ -147,4 +147,4 @@ architecture Behavioral of lightgame is
     
     end if;
     end process;
-end Behavioral;
+end Behavioral; 
