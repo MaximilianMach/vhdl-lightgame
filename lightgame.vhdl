@@ -66,7 +66,7 @@ architecture Behavioral of lightgame is
 
                 -- signalize target and change state
                 if btn = '1' then
-                    -- counter <= counter / 3.14; -- ❗❕ wokrs that?
+                    -- counter <= counter / 3.14; -- ❗❕ works that?
 
                     -- take first 4 bits from counter and set its value as target led
                     led[counter(4 downto 0)] <= '1';
@@ -75,34 +75,32 @@ architecture Behavioral of lightgame is
             when run =>
 
                 if switch = '0' then
-
-                    -- if counter full let target led chenge state
+                    -- if counter full let target led change state
                     if speed <= (others => '1') then
                         led[coutner(4 downto 0)] <= not led;
                     end if;
                     
-                    
+                    if btn = '1' then
+                        switch <= '1';
+                    end if;
+                
+                else 
+                    if hit < 6 then
+                        -- increase speed
+                        speed <= speed - to_unsigned(1,12);
+                    end if;
 
                     if btn = '1' then
-                        switch <= '0';
+                        halt <= '1';
+                        
+                        if led = target then
+                            hit <= hit + 1;
+                        else
+                            state <= init;
+                        end if;
+
                     end if;
-                if hit < 6 then
-                    -- increase speed
-                    speed <= speed - to_unsigned(1,12);
                 end if;
-
-
-                if btn = '1' then
-                    halt <= '1';
-                    
-                    if led = target then
-                        hit <= hit + 1;
-                    else
-                        state <= init;
-                    end if;
-
-                end if;
-
             when won =>
                 -- lightshow
 
