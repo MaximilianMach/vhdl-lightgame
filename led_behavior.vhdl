@@ -27,14 +27,14 @@ use IEEE.NUMERIC_STD.ALL;
 entity led_behavior is
     port (clk   : in std_logic;
           speed : in unsigned(19 downto 0);
-          led   : out std_logic_vector(15 downto 0) 
-          halt  : out std_logic);
+          leds_out: out unsigned(15 downto 0); 
+          stop  : in std_logic);
 end led_behavior;
 
 architecture behavioral of led_behavior is
     
     -- leds to sycle through
-    signal leds: unsigned(17 downto 0) := (others => '0');
+    signal leds: unsigned(15 downto 0) := (others => '0');
     signal count: unsigned(28 downto 0) := (others => '0');
    
     type state_type is (left, right, halt);
@@ -47,24 +47,33 @@ begin
         if rising_edge(clk) then
             count <= count + 1;
             
+            if stop = '1' then
+                state <= halt;
+            end if;
+                        
             if count = speed then
-
+                
+                -- reset counter
+                count <= (others=>'0');
+                
                 case state is
-                    when left <=
-                        led <= shift_right(led, 1);
-                        if led(0) = '1' then
+                    when left =>
+                        leds <= shift_right(leds, 1);
+                        if leds(0) = '1' then
                             state <= right;
                         end if;
-                    when right <=
-                        led <= shift_left(led, 1);
-                        if led(15) = '1' then
+                    when right =>
+                        leds <= shift_left(leds, 1);
+                        if leds(15) = '1' then
                             state <= left;
                         end if;
-                    when halt <= 
+                    when halt =>
+                        
                 end case;
 
             end if;
 
         end if;
+        leds_out <= leds;
     end process;
 end behavioral; 
