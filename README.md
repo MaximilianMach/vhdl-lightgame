@@ -8,7 +8,10 @@ The leds should switch the anode in a specific speed which is defined in the lig
 
 # TODO
 - [x] Determate target LED
-- [x] Signalize win
+- ~~[x]~~ Signalize win
+
+  Wrong thinking. Wont work as intended.
+  
 - [ ] Check if LED was hit
 
   Testing still needs to be done
