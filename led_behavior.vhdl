@@ -27,8 +27,8 @@ use IEEE.NUMERIC_STD.ALL;
 entity led_behavior is
     port (clk   : in std_logic;
           counter_max : in unsigned(19 downto 0);
-          leds_out: out unsigned(15 downto 0); 
-          hold  : in std_logic);
+          hold  : in std_logic;
+          leds_out: out unsigned(15 downto 0));
 end led_behavior;
 
 architecture behavioral of led_behavior is
