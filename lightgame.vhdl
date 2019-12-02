@@ -26,7 +26,8 @@ use IEEE.NUMERIC_STD.ALL;
 entity lightgame is
     port (clk : in std_logic;
           btn : in std_logic;
-          led_out: out std_logic_vector(15 downto 0));
+          led_out: out std_logic_vector(15 downto 0);
+          hold: out std_logic);
 end lightgame;
 
 architecture Behavioral of lightgame is
@@ -43,7 +44,8 @@ architecture Behavioral of lightgame is
     
     
     signal counter_max: unsigned (19 downto 0) := (others=>'1');
-
+    
+    signal halt: std_logic;
 
     signal led: std_logic_vector (15 downto 0) := (others=>'0');
     signal l_win: unsigned := "0";
@@ -51,13 +53,13 @@ architecture Behavioral of lightgame is
     signal win_two: unsigned := "0";
 
     
-    signal target: unsigned (4 downto 0) := (others=>'0');
+    signal target: integer;
      
     signal counter: unsigned (25 downto 0) := (others => '0');
     signal switch: unsigned := "0";
     
     begin
-        led_behav: led_behavior port map(clk=>clk, counter_max=>counter_max, led=>led);
+        led_behav: led_behavior port map(clk=>clk, counter_max=>counter_max, leds_out=>led);
         process(clk)
 
     begin
@@ -74,7 +76,7 @@ architecture Behavioral of lightgame is
                 -- decide target led with the time it took till btn press
                 if btn = '1' then
                     -- take first 4 bits from counter and set its value as target led
-                    target <= counter (4 downto 0);
+                    target <= to_integer(counter (4 downto 0));
                     -- set as target
                     led(target) <= '1';
                     
@@ -120,14 +122,14 @@ architecture Behavioral of lightgame is
                 end if;
                 
                 if hit = 6 then 
-                    state <= '1';
+                    state <= won;
                 end if;
 
             when won =>
                 -- lightshow
 
                 -- counts when to reset led position
-                hit <= '0';
+                hit <= "0";
 
                 -- start position are two in center
                 l_win <= l_win+1;
@@ -135,7 +137,7 @@ architecture Behavioral of lightgame is
 
                 -- reused hit variable
                 -- only run on first iteration:
-                if hit = '0' then
+                if hit = "0" then
                     led(8) <= '1';
                     led(7) <= '1';
                     hit <= hit + 1;
@@ -143,20 +145,20 @@ architecture Behavioral of lightgame is
 
 
                 if l_win > 15 then
-                    l_win <= '0';
-                    r_win <= '1';
+                    l_win <= "0";
+                    r_win <= "1";
 
                     -- init animation 2:
-                    hit <= 'Z';
+                    hit <= "Z";
                 end if;
 
                 -- when at the end of both directions:
-                if hit <= 'Z' then
+                if hit <= "Z" then
                     -- jump led from left to right with rising width
                     -- goes from outside to inside:
                     -- goes second
-                    led <= shift_right(led, l_win);
-                    led <= shift_left(led, r_win);
+                    led <= shift_right(led, l_win); -- bullshit
+                    led <= shift_left(led, r_win); 
                 else
                     -- goes from inside to outside
                     -- goes first
