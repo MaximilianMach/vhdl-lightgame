@@ -26,9 +26,9 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity led_behavior is
     port (clk   : in std_logic;
-          speed : in unsigned(19 downto 0);
+          counter_max : in unsigned(19 downto 0);
           leds_out: out unsigned(15 downto 0); 
-          stop  : in std_logic);
+          hold  : in std_logic);
 end led_behavior;
 
 architecture behavioral of led_behavior is
@@ -47,12 +47,11 @@ begin
         if rising_edge(clk) then
             count <= count + 1;
             
-            if stop = '1' then
+            if hold = '1' then
                 state <= halt;
             end if;
                         
-            if count = speed then
-                
+            if count = counter_max then
                 -- reset counter
                 count <= (others=>'0');
                 
@@ -74,6 +73,8 @@ begin
             end if;
 
         end if;
-        leds_out <= leds;
-    end process;
+        end process;
+
+    leds_out <= leds;
+
 end behavioral; 
