@@ -19,46 +19,56 @@
 ----------------------------------------------------------------------------------
 
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+library ieee;
+    use ieee.std_logic_1164.all;
+    use ieee.std_numeric.all;
 
 entity lightgame is
     port (clk : in std_logic;
           btn : in std_logic;
           led_out: out std_logic_vector(15 downto 0);
-          hold: out std_logic);
+          hold_out: out std_logic);
 end lightgame;
 
-architecture Behavioral of lightgame is
-    
+architecture behavioral of lightgame is
+    -- bind in component for running light
     component led_behavior is
         port (clk : in std_logic;
               counter_max: in unsigned(19 downto 0);
               leds_out : out std_logic_vector(15 downto 0));
     end component;
     
-    type state_type is (init, show, run, won);
+    -- define states
+    type state_type is (init, set, show, run, won);
+    -- start with init state
     signal state:  state_type := init;
-    signal hit: unsigned := "0";
     
+    -- counts the hits
+    signal hit: unsigned;
     
-    signal counter_max: unsigned (19 downto 0) := (others=>'1');
-    
-    signal halt: std_logic;
+    -- simple counter
+    signal counter: unsigned (25 downto 0) := (others => '0');
 
+    -- maximum counter value - determines the speed of the running light
+    signal counter_max: unsigned (19 downto 0);
+
+    -- vector for all the lights on the XLININX BASYS3 (15 left - 0 right)
     signal led: std_logic_vector (15 downto 0) := (others=>'0');
-    signal l_win: unsigned := "0";
-    signal r_win: unsigned := "1";
-    signal win_two: unsigned := "0";
 
-    
+    -- saves the shift which should be done for the winning signalisation
+    -- two leds active, going in two different directions
+    -- led(15 downto 8)
+    signal l_win: unsigned := "0";
+    -- led(7 downto 0)
+    signal r_win: unsigned := "1";
+
+    -- index of the target led in the led vector 
+    -- the led will be led(target)
     signal target: integer;
      
-    signal counter: unsigned (25 downto 0) := (others => '0');
-    signal switch: unsigned := "0";
     
     begin
+        -- bind in component of running led_behav (running light)
         led_behav: led_behavior port map(clk=>clk, counter_max=>counter_max, leds_out=>led);
         process(clk)
 
@@ -66,67 +76,83 @@ architecture Behavioral of lightgame is
     if rising_edge(clk) then
 
         case state is
+
             when init =>
+
+                -- set the hits
+                hit <= "0";
+
                 -- set start speed
                 counter_max <= (others=>'1');
 
+                -- set counter
+                counter <= (others=>'0');
+
+            -- determinate target led
+            when set =>
+
                 counter <= counter + 1;
 
-                -- signalize target and change state
-                -- decide target led with the time it took till btn press
+                -- wait for button to stop counter
+                -- signalize target
                 if btn = '1' then
-                    -- take first 4 bits from counter and set its value as target led
+                    -- take first 4 bits from counter and set its value as target index
                     target <= to_integer(counter (4 downto 0));
-                    -- set as target
+                    -- light up target
                     led(target) <= '1';
-                    
                     --reset counter
-                    counter <= (others => '1');
-                    
+                    counter <= (others => '0');
+                    -- continue to blink target
                     state <= show;
                 end if;
-                    
+
             -- signalize target led
             when show =>
                 counter <= counter + 1;
 
-                -- if counter equals counter_max let target led change state
-                -- creates blinking
-                if counter <= counter_max then
+                -- if counter is on max let target led change state
+                -- create blinking
+                if counter = (others=>'1') then
                     led(target) <= not led(target);
                 end if;
 
+                -- wait for btn to start game
                 if btn = '1' then
                     counter <= (others => '0');
                     state <= run;
                 end if;
 
+            -- actual game part
             when run =>
 
                 counter <= counter + 1;
 
-                if hit >= 1 then
-                    -- reduce counter_max -> make leds run faster
-                    counter_max <= counter_max - to_unsigned(1,12);
-                end if;
-
-
+                -- wait for btn to stop light
                 if btn = '1' then
-                    halt <= '1';
-                    
+                    -- tell component that light shall be stopped
+                    hold_out <= '1';
+
+                    -- if target was hit - increase hit counter and speed
                     if led(target) = '1' then
                         hit <= hit + 1;
+
+                        -- reduce counter_max -> make leds run faster
+                        counter_max <= counter_max - to_unsigned(1,12);
+
+                    -- otherwise reset game
                     else
                         state <= init;
                     end if;
+
                 end if;
-                
-                if hit = 6 then 
+
+                -- signalize win after 5 hits
+                if hit = 5 then 
                     state <= won;
                 end if;
 
+            -- lightshow
             when won =>
-                -- lightshow
 
                 -- counts when to reset led position
                 hit <= "0";
@@ -157,7 +183,7 @@ architecture Behavioral of lightgame is
                     -- jump led from left to right with rising width
                     -- goes from outside to inside:
                     -- goes second
-                    led <= shift_right(led, l_win); -- bullshit
+                    led <= shift_right(led, l_win); -- bullshit 💩
                     led <= shift_left(led, r_win); 
                 else
                     -- goes from inside to outside
@@ -177,4 +203,4 @@ architecture Behavioral of lightgame is
 
     led_out <= led;
 
-end Behavioral; 
+end behavioral;
