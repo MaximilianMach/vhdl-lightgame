@@ -25,45 +25,49 @@ use IEEE.NUMERIC_STD.ALL;
 
 
 entity led_behavior is
-    port (clk   : in std_logic;
-          counter_max : in unsigned(19 downto 0);
-          hold  : in std_logic;
-          leds_out: out unsigned(15 downto 0));
+    port (clk : in std_logic;
+          hold_in: in std_logic;
+          counter_max: in unsigned(19 downto 0);
+          led_out: out unsigned(15 downto 0));
 end led_behavior;
 
 architecture behavioral of led_behavior is
 
     -- leds to cycle through
-    signal leds: unsigned(15 downto 0) := (others => '0');
-    signal count: unsigned(28 downto 0) := (others => '0');
-   
-    type state_type is (left, right, halt);
-    signal state: state_type := left;
+    -- set left led on using hex code
+    signal led: unsigned(15 downto 0) := x"8000";
 
+    -- init counter
+    signal count: unsigned(28 downto 0) := (others => '0');
+    
+    -- define states
+    type state_type is (right, left, hold);
+    signal state: state_type := left;
 
 begin
     toggle: process(clk)
     begin
         if rising_edge(clk) then
+
             count <= count + 1;
-            
-            if hold = '1' then
+
+            if hold_in = '1' then
                 state <= halt;
             end if;
-                        
-            if count = counter_max then
+
+            if count >= counter_max then
                 -- reset counter
                 count <= (others=>'0');
                 
                 case state is
                     when left =>
-                        leds <= shift_right(leds, 1);
-                        if leds(0) = '1' then
+                        led <= shift_right(led, 1);
+                        if led(0) = '1' then
                             state <= right;
                         end if;
                     when right =>
-                        leds <= shift_left(leds, 1);
-                        if leds(15) = '1' then
+                        led <= shift_left(led, 1);
+                        if led(15) = '1' then
                             state <= left;
                         end if;
                     when halt =>
@@ -75,6 +79,6 @@ begin
         end if;
         end process;
 
-    leds_out <= leds;
+    led_out <= led;
 
 end behavioral;
