@@ -125,8 +125,6 @@ architecture behavioral of lightgame is
             -- actual game part
             when run =>
 
-                counter <= counter + 1;
-
                 -- wait for btn to stop light
                 if btn = '1' then
                     -- tell component that light shall be stopped
