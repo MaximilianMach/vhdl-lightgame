@@ -28,7 +28,7 @@ entity led_behavior is
     port (clk : in std_logic;
           hold_in: in std_logic;
           counter_max: in unsigned(19 downto 0);
-          led_out: out unsigned(15 downto 0));
+          led_out: out std_logic_vector(15 downto 0));
 end led_behavior;
 
 architecture behavioral of led_behavior is
@@ -45,7 +45,7 @@ architecture behavioral of led_behavior is
     signal state: state_type := right;
 
     -- index of the active led - for blinking hit one
-    signal pos: integer = 15;
+    signal pos: integer := 15;
 
 begin
     toggle: process(clk)
@@ -55,7 +55,7 @@ begin
             count <= count + 1;
 
             if hold_in = '1' then
-                state <= halt;
+                state <= hold;
             end if;
             
             -- shift according to current speed
@@ -96,6 +96,6 @@ begin
         end if;
         end process;
 
-    led_out <= led;
+    led_out <= std_logic_vector(led);
 
 end behavioral;
