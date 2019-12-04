@@ -21,22 +21,21 @@
 
 library ieee;
     use ieee.std_logic_1164.all;
-    use ieee.std_numeric.all;
+    use ieee.numeric_std.all;
 
 entity lightgame is
     port (clk : in std_logic;
           btn : in std_logic;
-          led_out: out std_logic_vector(15 downto 0);
-          hold_out: out std_logic);
+          led_out: out std_logic_vector(15 downto 0));
 end lightgame;
 
-architecture behavioral of lightgame is
+architecture arch of lightgame is
     -- bind in component for running light
     component led_behavior is
         port (clk : in std_logic;
               hold_in: in std_logic;
               counter_max: in unsigned(19 downto 0);
-              led_out: out unsigned(15 downto 0));
+              led_out: out std_logic_vector(15 downto 0));
     end component;
     
     -- define states
@@ -45,7 +44,10 @@ architecture behavioral of lightgame is
     signal state:  state_type := init;
     
     -- counts the hits
-    signal hit: unsigned;
+    signal hit: integer;
+    
+    -- hold interrupt
+    signal hold: std_logic := '0';
     
     -- simple counter
     signal counter: unsigned (25 downto 0) := (others => '0');
@@ -64,16 +66,16 @@ architecture behavioral of lightgame is
     -- start with two leds in center - grows outside in the state
     -- works like that: led(wpl downto wpr) = ws
     -- left position
-    signal wpl: integer = 8;
+    signal wpl: integer := 8;
     -- right position
-    signal wpr: integer = 7;
+    signal wpr: integer := 7;
     -- led state - 1 or 0 
-    signal ws: std_logic = '1';
+    signal ws: std_logic := '1';
      
     
     begin
         -- bind in component of running led_behav (running light)
-        led_behav: led_behavior port map(clk=>clk, counter_max=>counter_max, leds_out=>led);
+        led_behav: led_behavior port map(clk=>clk, hold_in=>hold, counter_max=>counter_max, led_out=>led);
         process(clk)
 
     begin
@@ -84,7 +86,7 @@ architecture behavioral of lightgame is
             when init =>
 
                 -- set the hits
-                hit <= "0";
+                hit <= 0;
 
                 -- set start speed
                 counter_max <= (others=>'1');
@@ -93,7 +95,7 @@ architecture behavioral of lightgame is
                 counter <= (others=>'0');
 
                 -- set all leds off
-                led <= (others=>'0');
+                led <= x"0000";
 
             -- determinate target led
             when set =>
@@ -119,7 +121,7 @@ architecture behavioral of lightgame is
 
                 -- if counter is on max let target led change state
                 -- create blinking
-                if counter = (others=>'1') then
+                if counter = counter_max then
                     led(target) <= not led(target);
                 end if;
 
@@ -135,7 +137,7 @@ architecture behavioral of lightgame is
                 -- wait for btn to stop light
                 if btn = '1' then
                     -- tell component that light shall be stopped
-                    hold_out <= '1';
+                    hold <= '1';
 
                     -- if target was hit - increase hit counter and speed
                     if led(target) = '1' then
@@ -163,7 +165,7 @@ architecture behavioral of lightgame is
 
                 if counter = counter_max then
                     -- set two in center as defined
-                    led(wpl downto wpl) = ws;
+                    led(wpl downto wpl) <= (others=>ws);
 
                     if wpl /= 15 then
                         -- increase size of positions
@@ -172,11 +174,11 @@ architecture behavioral of lightgame is
 
                     else
                         -- recenter
-                        wpl = 8;
-                        wpr = 7;
+                        wpl <= 8;
+                        wpr <= 7;
 
                         -- set state to off
-                        ws = '0';
+                        ws <= '0';
                     end if;
 
                 end if;
@@ -192,4 +194,4 @@ architecture behavioral of lightgame is
 
     led_out <= led;
 
-end behavioral;
+end arch;
