@@ -1,24 +1,3 @@
-----------------------------------------------------------------------------------
--- Company:
--- Engineer: Maximilian Mach
--- 
--- Create Date: 04.11.2019 13:49:30
--- Design Name: 
--- Module Name: led_behavior - Behavioral
--- Project Name: vhdl-lightgame
--- Target Devices: XILINX BASYS 3
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -45,7 +24,7 @@ architecture behavioral of led_behavior is
     signal state: state_type := right;
 
     -- index of the active led - for blinking hit one
-    signal pos: integer = 15;
+    signal pos: integer := 15;
 
 begin
     toggle: process(clk)
@@ -55,7 +34,7 @@ begin
             count <= count + 1;
 
             if hold_in = '1' then
-                state <= halt;
+                state <= hold;
             end if;
             
             -- shift according to current speed
