@@ -44,6 +44,9 @@ architecture behavioral of led_behavior is
     type state_type is (right, left, hold);
     signal state: state_type := right;
 
+    -- index of the active led - for blinking hit one
+    signal pos: integer = 15;
+
 begin
     toggle: process(clk)
     begin
@@ -54,24 +57,38 @@ begin
             if hold_in = '1' then
                 state <= halt;
             end if;
-
+            
+            -- shift according to current speed
             if count >= counter_max then
                 -- reset counter
                 count <= (others=>'0');
                 
                 case state is
+                    -- shift till right end
                     when right =>
                         led <= shift_right(led, 1);
+                        
+                        -- save current position
+                        pos <= pos - 1;
+
                         if led(0) = '1' then
                             state <= left;
                         end if;
+
+                    -- shift till left end
                     when left =>
                         led <= shift_left(led, 1);
+
+                        -- save current position
+                        pos <= pos + 1;
+
                         if led(15) = '1' then
                             state <= right;
                         end if;
-                    when halt =>
-                        
+
+                    -- blink hit led
+                    when hold =>
+                        led(pos) <= not led(pos);
                 end case;
 
             end if;
