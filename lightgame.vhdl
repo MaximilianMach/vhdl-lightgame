@@ -34,8 +34,9 @@ architecture behavioral of lightgame is
     -- bind in component for running light
     component led_behavior is
         port (clk : in std_logic;
+              hold_in: in std_logic;
               counter_max: in unsigned(19 downto 0);
-              leds_out : out std_logic_vector(15 downto 0));
+              led_out: out unsigned(15 downto 0));
     end component;
     
     -- define states
