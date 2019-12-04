@@ -42,7 +42,7 @@ architecture behavioral of led_behavior is
     
     -- define states
     type state_type is (right, left, hold);
-    signal state: state_type := left;
+    signal state: state_type := right;
 
 begin
     toggle: process(clk)
@@ -60,15 +60,15 @@ begin
                 count <= (others=>'0');
                 
                 case state is
-                    when left =>
+                    when right =>
                         led <= shift_right(led, 1);
                         if led(0) = '1' then
-                            state <= right;
+                            state <= left;
                         end if;
-                    when right =>
+                    when left =>
                         led <= shift_left(led, 1);
                         if led(15) = '1' then
-                            state <= left;
+                            state <= right;
                         end if;
                     when halt =>
                         
