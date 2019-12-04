@@ -32,8 +32,8 @@ entity led_behavior is
 end led_behavior;
 
 architecture behavioral of led_behavior is
-    
-    -- leds to sycle through
+
+    -- leds to cycle through
     signal leds: unsigned(15 downto 0) := (others => '0');
     signal count: unsigned(28 downto 0) := (others => '0');
    
@@ -77,4 +77,4 @@ begin
 
     leds_out <= leds;
 
-end behavioral; 
+end behavioral;
