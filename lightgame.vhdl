@@ -54,18 +54,21 @@ architecture behavioral of lightgame is
     signal counter_max: unsigned (19 downto 0);
 
     -- vector for all the lights on the XLININX BASYS3 (15 left - 0 right)
-    signal led: std_logic_vector (15 downto 0) := (others=>'0');
-
-    -- saves the shift which should be done for the winning signalisation
-    -- two leds active, going in two different directions
-    -- led(15 downto 8)
-    signal l_win: unsigned := "0";
-    -- led(7 downto 0)
-    signal r_win: unsigned := "1";
-
+    signal led: std_logic_vector (15 downto 0);
+    
     -- index of the target led in the led vector 
     -- the led will be led(target)
     signal target: integer;
+
+    -- signals for the won state:
+    -- start with two leds in center - grows outside in the state
+    -- works like that: led(wpl downto wpr) = ws
+    -- left position
+    signal wpl: integer = 8;
+    -- right position
+    signal wpr: integer = 7;
+    -- led state - 1 or 0 
+    signal ws: std_logic = '1';
      
     
     begin
@@ -88,6 +91,9 @@ architecture behavioral of lightgame is
 
                 -- set counter
                 counter <= (others=>'0');
+
+                -- set all leds off
+                led <= (others=>'0');
 
             -- determinate target led
             when set =>
@@ -152,43 +158,27 @@ architecture behavioral of lightgame is
 
             -- lightshow
             when won =>
+                
+                counter <= counter + 1;
 
-                -- counts when to reset led position
-                hit <= "0";
+                if counter = counter_max then
+                    -- set two in center as defined
+                    led(wpl downto wpl) = ws;
 
-                -- start position are two in center
-                l_win <= l_win+1;
-                r_win <= r_win+1;
+                    if wpl /= 15 then
+                        -- increase size of positions
+                        wpl <= wpl + 1;
+                        wpr <= wpr - 1;
 
-                -- reused hit variable
-                -- only run on first iteration:
-                if hit = "0" then
-                    led(8) <= '1';
-                    led(7) <= '1';
-                    hit <= hit + 1;
-                end if;
+                    else
+                        -- recenter
+                        wpl = 8;
+                        wpr = 7;
 
+                        -- set state to off
+                        ws = '0';
+                    end if;
 
-                if l_win > 15 then
-                    l_win <= "0";
-                    r_win <= "1";
-
-                    -- init animation 2:
-                    hit <= "Z";
-                end if;
-
-                -- when at the end of both directions:
-                if hit <= "Z" then
-                    -- jump led from left to right with rising width
-                    -- goes from outside to inside:
-                    -- goes second
-                    led <= shift_right(led, l_win); -- bullshit 💩
-                    led <= shift_left(led, r_win); 
-                else
-                    -- goes from inside to outside
-                    -- goes first
-                    led <= shift_left(led, l_win);
-                    led <= shift_right(led, r_win);
                 end if;
 
                 -- reset on btn press
