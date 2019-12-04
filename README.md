@@ -15,3 +15,5 @@ The leds should switch the anode in a specific speed which is defined in the lig
 - [x] Check if LED was hit
 
   Testing still needs to be done
+
+- [ ] Choose Counter Size 
