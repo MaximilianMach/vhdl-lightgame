@@ -21,4 +21,5 @@ Simply sets the running light accoding to the current speed and includes the sto
 
   Testing still needs to be done
 
-- [ ] Choose Counter Size 
+- [ ] Choose Counter Size
+- [ ] Fix multiple Net Error
