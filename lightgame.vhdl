@@ -46,7 +46,7 @@ architecture arch of lightgame is
     -- counts the hits
     signal hit: integer;
     
-    -- hold interrupt
+    -- triggers interrupt in led_behavior
     signal hold: std_logic := '0';
     
     -- simple counter
