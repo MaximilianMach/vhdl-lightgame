@@ -7,7 +7,7 @@ entity led_behavior is
     port (clk : in std_logic;
           hold_in: in std_logic;
           counter_max: in unsigned(19 downto 0);
-          led_out: out std_logic_vector(15 downto 0));
+          led_out2: out std_logic_vector(15 downto 0));
 end led_behavior;
 
 architecture behavioral of led_behavior is
@@ -75,6 +75,6 @@ begin
         end if;
         end process;
 
-    led_out <= std_logic_vector(led);
+    led_out2 <= std_logic_vector(led);
 
 end behavioral;
