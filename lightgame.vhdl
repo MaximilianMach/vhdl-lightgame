@@ -35,7 +35,7 @@ architecture arch of lightgame is
         port (clk : in std_logic;
               hold_in: in std_logic;
               counter_max: in unsigned(19 downto 0);
-              led_out: out std_logic_vector(15 downto 0));
+              led_out2: out std_logic_vector(15 downto 0));
     end component;
     
     -- define states
@@ -57,6 +57,7 @@ architecture arch of lightgame is
 
     -- vector for all the lights on the XLININX BASYS3 (15 left - 0 right)
     signal led: std_logic_vector (15 downto 0);
+    signal led_game: std_logic_vector (15 downto 0);
     
     -- index of the target led in the led vector 
     -- the led will be led(target)
@@ -75,7 +76,7 @@ architecture arch of lightgame is
     
     begin
         -- bind in component of running led_behav (running light)
-        led_behav: led_behavior port map(clk=>clk, hold_in=>hold, counter_max=>counter_max, led_out=>led);
+        led_behav: led_behavior port map(clk=>clk, hold_in=>hold, counter_max=>counter_max, led_out2=>led_game);
         process(clk)
 
     begin
@@ -93,9 +94,6 @@ architecture arch of lightgame is
 
                 -- set counter
                 counter <= (others=>'0');
-
-                -- set all leds off
-                led <= x"0000";
 
             -- determinate target led
             when set =>
@@ -157,7 +155,8 @@ architecture arch of lightgame is
                 if hit = 5 then 
                     state <= won;
                 end if;
-
+                
+                led <= led_game;
             -- lightshow
             when won =>
                 
